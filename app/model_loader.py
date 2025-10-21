@@ -1,0 +1,9 @@
+from tensorflow import keras
+
+# Cargar modelo solo una vez al iniciar FastAPI
+model = keras.models.load_model("models/best_gru_model.keras",compile=False)
+idx_to_char={0: '<PAD>', 1: '<START>', 2: '<END>', 3: 'a', 4: 'b', 5: 'c', 6: 'd', 7: 'e', 8: 'f', 9: 'g', 10: 'h', 11: 'i', 12: 'j', 13: 'k', 14: 'l', 15: 'm', 16: 'n', 17: 'o', 18: 'p', 19: 'q', 20: 'r', 21: 's', 22: 't', 23: 'u', 24: 'v', 25: 'w', 26: 'x', 27: 'y', 28: 'z'}
+char_to_idx={'<PAD>': 0, '<START>': 1, '<END>': 2, 'a': 3, 'b': 4, 'c': 5, 'd': 6, 'e': 7, 'f': 8, 'g': 9, 'h': 10, 'i': 11, 'j': 12, 'k': 13, 'l': 14, 'm': 15, 'n': 16, 'o': 17, 'p': 18, 'q': 19, 'r': 20, 's': 21, 't': 22, 'u': 23, 'v': 24, 'w': 25, 'x': 26, 'y': 27, 'z': 28}
+
+def get_model():
+    return model, char_to_idx, idx_to_char
