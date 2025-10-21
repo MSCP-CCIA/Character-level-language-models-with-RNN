@@ -1,0 +1,64 @@
+/* Añadir al final de App.css: navbar fijo */
+/* Añadir navbar fijo y estilos alineados con App.jsx */
+
+:root{ --glass-border: rgba(255,255,255,0.04); }
+body { padding-top:72px; /* espacio para el navbar fijo */ }
+
+.navbar{
+  position:fixed;
+  top:0; left:0; right:0;
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 20px;
+  gap:16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-bottom:1px solid var(--glass-border);
+  backdrop-filter: blur(8px) saturate(120%);
+  z-index:1000;
+}
+
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand .title{ font-weight:700; font-size:0.95rem; color:var(--muted) }
+
+.nav-list{ list-style:none; margin:0; padding:0; display:flex; gap:8px; align-items:center }
+.nav-list li{ margin:0 }
+.nav-link{
+  padding:8px 12px;
+  border-radius:8px;
+  background:transparent;
+  border:1px solid transparent;
+  color:var(--text);
+  cursor:pointer;
+  font-weight:600;
+}
+.nav-link:hover{ background:rgba(255,255,255,0.02); transform:translateY(-2px) }
+.nav-link.active{ background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#001; }
+
+/* Responsive: ocultar links y dejar solo logo (user may add mobile menu later) */
+@media (max-width:720px){
+  .nav-list{ display:none }
+  body { padding-top:64px; }
+}
+
+/* Util: aseguramos que main tiene separación visual */
+/* Welcome / hero adjustments */
+.hero-welcome{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  margin-top:36px; /* baja el bloque de bienvenida */
+  padding:20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  border-radius:12px;
+}
+.hero-welcome .hero-text{ flex:1 }
+.hero-welcome .decor-img{ width:260px; max-width:40%; border-radius:10px; object-fit:cover }
+
+main{ padding:20px; max-width:1100px; margin:0 auto }
+
+@media (max-width:820px){
+  .hero-welcome{ flex-direction:column; margin-top:18px }
+  .hero-welcome .decor-img{ width:100%; max-width:100% }
+}

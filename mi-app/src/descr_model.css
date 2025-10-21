@@ -1,0 +1,360 @@
+/* ===========================
+   Tema formal/tecnológico – v3 (con gutter lateral)
+   Más legible, tipografía moderada y layout contenido
+   =========================== */
+:root{
+  /* Paleta sobria */
+  --bg:#0f1217;
+  --panel:#111620;
+  --panel-2:#0e1420;
+  --text:#e7ebf1;
+  --muted:#9aa6ba;
+  --border:#1c2433;
+  --line:#212a3b;
+  --accent:#4e94ff;
+  --accent-2:#35c8ff;
+
+  /* Tipografía y escala */
+  --ff: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial;
+  --fs-xxl: clamp(26px, 2.8vw, 34px);
+  --fs-xl: clamp(18px, 2vw, 22px);
+  --fs-md: clamp(14px, 1.1vw, 16px);
+  --fs-sm: clamp(12px, .95vw, 14px);
+
+  --radius: 12px;
+  --shadow: 0 8px 28px rgba(0,0,0,.28);
+
+  /* medidas */
+  --container: 980px;       /* ancho de lectura más cómodo */
+  --measure: 72ch;          /* ancho óptimo de párrafo */
+
+  /* NUEVO: gutter/respiración lateral global */
+  --outer-gutter: clamp(20px, 6vw, 80px);
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f6f8fc; --panel:#ffffff; --panel-2:#f8fafc;
+    --text:#0f172a; --muted:#5a6780; --border:#e1e7f1; --line:#e8edf6;
+    --shadow: 0 8px 22px rgba(30,41,59,.12);
+  }
+}
+
+/* Accesibilidad: respeta preferencias de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ==== Base */
+*{box-sizing:border-box}
+
+/* APLICA el fondo a TODA la jerarquía raíz para que no se “corte” */
+html, body, #root, #app, main{
+  min-height: 100%;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 800px at 20% -10%, rgba(90,160,255,0.09), transparent 50%),
+    radial-gradient(1000px 600px at 120% 10%, rgba(68,209,255,0.08), transparent 55%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;        /* evita cortes al hacer scroll */
+  background-size: 140% 140%, 140% 140%;
+}
+
+html{
+  height: auto;                         /* permite crecer con el contenido */
+}
+
+body{
+  height: 100%;
+  margin:0;
+  color:var(--text);
+  font-family:var(--ff);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+
+  /* GUTTER lateral y respiración vertical (sin centrar con flex) */
+  padding-inline: var(--outer-gutter);
+  padding-block: 24px;
+}
+
+/* Evita fondo gris por capas intermedias */
+#root, #app, main{ background-color: transparent !important; }
+
+/* ==== Contenedor principal (centrado horizontalmente) */
+.informe{
+  /* Centrado exacto respecto al viewport: ancho fijo en vw y centrado con left+transform */
+  max-width: 1200px; /* tope razonable en pantallas muy grandes */
+  width: 70vw; /* aumentar ancho: 70% del viewport */
+  margin-block: 24px;                    /* margen vertical; horizontal se controla con left/transform */
+  position: relative;
+  left: 50vw; /* posiciona en el centro del viewport */
+  transform: translateX(-50%);
+  padding: clamp(16px, 3vw, 28px);
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  outline: 1px solid rgba(255,255,255,0.04);
+  outline-offset: 0;
+}
+
+/* ==== Encabezado */
+.informe__header{
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom:1px solid var(--line);
+}
+.informe__title{
+  margin:0 0 6px;
+  font-size: var(--fs-xxl);
+  font-weight: 700;
+  letter-spacing:.2px;
+  line-height:1.25;
+}
+.informe__subtitle{
+  margin:0;
+  font-size: var(--fs-md);
+  color:var(--muted);
+  max-width: var(--measure);
+}
+
+/* ==== Secciones */
+.informe__section{ margin: 22px 0; }
+.section__title{
+  margin:0 0 10px;
+  font-size: var(--fs-xl);
+  font-weight: 650;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  position:relative;
+}
+.section__title::after{
+  content:"";
+  position:absolute;
+  left:0; bottom:-6px;
+  width:56px; height:2px; border-radius:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity:.9;
+}
+.section__text{
+  margin:8px 0 0;
+  font-size:var(--fs-md);
+  max-width:var(--measure);
+}
+
+/* ==== Listas */
+.bullets{
+  margin:8px 0 0;
+  padding-left: 18px;
+  max-width: var(--measure);
+}
+.bullets li{ margin:6px 0; }
+.lista-nombres{
+  margin:10px 0 6px;
+  padding-left: 22px;
+}
+.nombre-item{
+  padding:4px 2px;
+  border-left:2px solid transparent;
+  border-radius:6px;
+  transition:border-color .15s ease, background .15s ease;
+}
+.nombre-item:hover{
+  border-left-color:var(--accent);
+  background:rgba(78,148,255,.07);
+}
+
+/* ==== Tablas */
+.table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  margin:12px 0;
+  background: var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.table thead th{
+  text-align:left;
+  font-weight:700;
+  font-size:var(--fs-sm);
+  padding:10px 12px;
+  color:var(--text);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+  border-bottom:1px solid var(--line);
+}
+.table tbody td{
+  font-size:var(--fs-sm);
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+}
+.table tbody tr:last-child td{ border-bottom:none; }
+.table tbody tr:hover{ background: rgba(94,113,150,.08); }
+.table--metrics thead th{ color:var(--accent); }
+.table--sampling thead th{ color: #caa24e; }
+.table--compare thead th{ color: var(--accent-2); }
+
+/* ==== Avisos / placeholder */
+.callout{
+  margin-top:10px;
+  padding:12px 14px;
+  border:1px dashed var(--accent);
+  border-radius:10px;
+  background: linear-gradient(180deg, rgba(78,148,255,.08), rgba(78,148,255,0));
+  font-size: var(--fs-sm);
+}
+.curvas__placeholder{
+  margin-top:10px;
+  height: clamp(150px, 24vw, 210px);
+  border:1px dashed var(--line);
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  color:var(--muted);
+}
+
+/* ==== Enlaces y foco */
+a, button{
+  color:var(--accent);
+  text-decoration:none;
+  transition: color .12s ease;
+}
+a:hover, button:hover{ color:var(--accent-2); }
+:focus-visible{
+  outline:2px solid var(--accent-2);
+  outline-offset:2px;
+  border-radius:6px;
+}
+
+/* =================
+   Responsividad
+   ================= */
+
+/* Tablets */
+@media (max-width: 1024px){
+  :root{ --container: 860px; }
+  .informe{ padding: 18px; }
+}
+
+/* Móviles */
+@media (max-width: 760px){
+  :root{
+    --fs-xxl: clamp(22px, 6vw, 28px);
+    --fs-xl: clamp(16px, 4.5vw, 20px);
+    --fs-md: clamp(14px, 3.8vw, 15px);
+    --fs-sm: clamp(12px, 3.4vw, 14px);
+
+    /* GUTTER móvil más compacto */
+    --outer-gutter: clamp(12px, 4vw, 24px);
+  }
+
+  .informe{
+    padding:14px;
+    /* En móviles usar todo el ancho del contenedor/gutter para una lectura cómoda */
+    width: 100%;
+    border-radius:10px;
+  }
+
+  /* Tablas como tarjetas */
+  .table thead{ display:none; }
+  .table, .table tbody, .table tr, .table td{ display:block; width:100%; }
+  .table tr{
+    margin:0 0 10px 0;
+    border-bottom:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+  }
+  .table td{
+    border:none;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    padding:10px 12px 10px 46%;
+    min-height: 40px;
+    font-size: var(--fs-sm);
+  }
+  .table td:last-child{ border-bottom:none; }
+  .table td::before{
+    content: attr(data-label); /* Añade data-label en JSX para cada td */
+    position:absolute; left:12px; top:50%; transform: translateY(-50%);
+    color:var(--muted); font-weight:600; font-size:12px; letter-spacing:.2px;
+    width:40%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+}
+
+/* Micro-móviles */
+@media (max-width: 380px){
+  .informe{ padding:12px; }
+  .section__title::after{ width:44px; }
+}
+
+/* ==== Print */
+@media print{
+  :root{
+    --bg:#fff; --panel:#fff; --text:#0b1220; --muted:#374151;
+    --border:#d8dee9; --line:#e6eaf2; --shadow:none;
+    --outer-gutter: 0px;
+  }
+  /* Fondo blanco para impresión y sin padding de gutter */
+  html, body, #root, #app, main{
+    background: #fff !important;
+    background-image: none !important;
+  }
+  body{ padding-inline: 0; padding-block: 0; }
+  .informe{
+    box-shadow:none;
+    border:1px solid var(--border);
+    max-width:100%;
+    margin:0;
+    border-radius:0;
+  }
+  a[href]:after{ content:""; }
+}
+
+/* =================
+   (Opcional) Sidebar
+   ================= */
+/* Si tu layout tiene una barra lateral fija a la izquierda,
+   añade la clase al <body> para un empuje extra en desktop: */
+@media (min-width: 1025px){
+  body.has-sidebar-left .informe{
+    margin-left: clamp(12px, 2vw, 24px);
+  }
+}
+
+/* ==== Comparativa de imágenes (LSTM vs GRU) */
+.comparativa{
+  display:flex;
+  gap:16px;
+  align-items:stretch;
+  margin-top:12px;
+}
+.comparativa .curva{
+  flex:1 1 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.curva__img{
+  width:100%;
+  height:auto;
+  border-radius:6px;
+  display:block;
+}
+.curva__caption{
+  font-weight:700;
+  color:var(--muted);
+  font-size:var(--fs-sm);
+  text-align:center;
+}
+
+@media (max-width:760px){
+  .comparativa{ flex-direction:column }
+}

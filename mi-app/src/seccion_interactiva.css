@@ -1,0 +1,142 @@
+/* ====== Variables opcionales (ajusta a tu tema) ====== */
+:root{
+  --panel:#111620;
+  --panel-2:#0e1420;
+  --text:#e7ebf1;
+  --muted:#9aa6ba;
+  --border:#1c2433;
+  --line:#212a3b;
+  --accent:#4e94ff;
+}
+
+/* ====== Contenedor principal ====== */
+section[aria-labelledby="nuevo-dino"]{
+  margin-top: 100px;
+}
+
+/* Título + fila de acciones */
+section[aria-labelledby="nuevo-dino"] > div:first-child{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+section[aria-labelledby="nuevo-dino"] h2{
+  margin: 8px 0;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+/* ====== Botón “Nuevo Dinosaurio” ====== */
+section[aria-labelledby="nuevo-dino"] button{
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #111620;
+  color: var(--text);
+  cursor: pointer;
+  transition: transform .06s ease, background .2s ease, border-color .2s ease;
+}
+
+section[aria-labelledby="nuevo-dino"] button:hover:not(:disabled){
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+section[aria-labelledby="nuevo-dino"] button:active:not(:disabled){
+  transform: translateY(0);
+}
+
+section[aria-labelledby="nuevo-dino"] button:disabled{
+  background:#243042;
+  cursor:not-allowed;
+  opacity:.8;
+}
+
+/* ====== Mensaje de error ====== */
+section[aria-labelledby="nuevo-dino"] > p{
+  color:#ff8888;
+  margin-top: 8px;
+}
+
+/* ====== Grid de tarjetas generadas ====== */
+section[aria-labelledby="nuevo-dino"] [role="list"]{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap:16px;
+  margin-top:16px;
+}
+
+/* Tarjeta */
+section[aria-labelledby="nuevo-dino"] [role="listitem"]{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition: box-shadow .2s ease, transform .12s ease, border-color .2s ease;
+}
+
+section[aria-labelledby="nuevo-dino"] [role="listitem"]:hover{
+  border-color: var(--accent);
+  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+  transform: translateY(-2px);
+}
+
+/* Media (imagen o placeholder) */
+section[aria-labelledby="nuevo-dino"] [role="listitem"] > div:first-child{
+  width:100%;
+  aspect-ratio: 16/9;
+  background: var(--panel-2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+section[aria-labelledby="nuevo-dino"] img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  border:0;
+}
+
+/* Placeholder cuando no hay imagen */
+section[aria-labelledby="nuevo-dino"] [role="listitem"] > div:first-child > div{
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Cuerpo de la tarjeta */
+section[aria-labelledby="nuevo-dino"] [role="listitem"] > div:last-child{
+  padding: 12px 14px 14px;
+}
+
+section[aria-labelledby="nuevo-dino"] h3{
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+section[aria-labelledby="nuevo-dino"] [role="listitem"] p{
+  margin:0;
+  color: var(--muted);
+  line-height:1.5;
+  font-size: 15px;
+}
+
+/* ====== Utilidades opcionales ====== */
+@media (prefers-reduced-motion: reduce){
+  * { transition: none !important; }
+}
