@@ -1,10 +1,28 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Chat con Dinosaurios", version="1.0.0")
+
+@app.options("/{rest_of_path:path}")
+async def options_handler(rest_of_path: str):
+    """
+    Respuesta genérica para cualquier petición OPTIONS (preflight CORS).
+    Esto evita el error 405 Method Not Allowed y asegura que los navegadores
+    puedan realizar peticiones POST sin bloqueo.
+    """
+    return JSONResponse(
+        content={"message": "ok"},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
+    )
 
 contexto_global = {
     "nombre": None,
@@ -53,7 +71,7 @@ modelo = ChatGoogleGenerativeAI(
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("system",
-     "Eres {dino_nombre}. Tu personalidad, conocimientos y recuerdos están estrictamente limitados a la siguiente descripción: '{dino_descripcion}'. Responde al usuario actuando como este dinosaurio, basándote únicamente en esa información. No inventes hechos ni conocimientos fuera de esa descripción. Sé directo y mantén el personaje en todo momento."),
+     "You are {dino_nombre}. Your personality, knowledge, and memories are strictly limited to the following description: '{dino_descripcion}'. Respond to the user by acting like this dinosaur, based solely on that information. Do not fabricate facts or knowledge outside of that description. Be direct and stay in character at all times."),
     ("user", "{mensaje_usuario}")
 ])
 

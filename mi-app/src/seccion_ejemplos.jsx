@@ -1,4 +1,3 @@
-import React from "react";
 import "./seccion_ejemplos.css";
 import img1 from "./assets/1.jpg";
 import img2 from "./assets/2.jpg";
@@ -10,13 +9,14 @@ import img7 from "./assets/7.jpg";
 import img8 from "./assets/8.jpg";
 import img9 from "./assets/9.jpg";
 import img10 from "./assets/10.jpg";
+
 export default function DinosauriosGallery() {
   const especies = [
     {
       nombre: "Pacospylus",
       descripcion:
         "Deriva del griego “pako” (pacífico) y “pylus” (piel). Terópodo mediano (6–8 m), dentición carnívora con dientes pequeños y redondeados. Jurásico Superior (~150 Ma), llanuras costeras y bosques ribereños de Patagonia, Argentina.",
-      imgSrc: img1, // ej: "/images/pacospylus.jpg"
+      imgSrc: img1,
     },
     {
       nombre: "Parastiodys",
@@ -46,7 +46,7 @@ export default function DinosauriosGallery() {
       nombre: "Crorodon",
       descripcion:
         "De “cror-” (canto) + odon (diente). Terópodo ~6 m, dientes curvados para presas pequeñas, cresta/pico óseo dorsal (display). Jurásico Superior, bosques subtropicales patagónicos; caza en grupos.",
-      imgSrc:  img6,
+      imgSrc: img6,
     },
     {
       nombre: "Cenatosaurus",
@@ -58,7 +58,7 @@ export default function DinosauriosGallery() {
       nombre: "Polosaurus",
       descripcion:
         "De “poly” (muchos) + saurus. ~6 m, carnívoro con plumas dorsales pequeñas (etapa temprana). Robusto y veloz, depredador ágil de llanuras del Cretácico Superior en Patagonia.",
-      imgSrc:  img8,
+      imgSrc: img8,
     },
     {
       nombre: "Alaticus",
@@ -74,6 +74,34 @@ export default function DinosauriosGallery() {
     },
   ];
 
+  // Función para definir el contexto en el backend
+  const definirContexto = async (nombre, descripcion) => {
+    try {
+      const response = await fetch(
+        "https://propertied-carolann-nonprivileged.ngrok-free.dev/definir_contexto",
+        {
+          method: "POST",
+          mode: "cors", 
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({ nombre, descripcion }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al definir el contexto del dinosaurio");
+      }
+
+      const data = await response.json();
+      alert(data.mensaje);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("No se pudo configurar el dinosaurio");
+    }
+  };
+
   return (
     <section aria-labelledby="galeria-dinos" className="galeria-dinos">
       <h2 id="galeria-dinos">DinoNames Generados</h2>
@@ -81,14 +109,31 @@ export default function DinosauriosGallery() {
         A continuación se presentan los nombres, descripciones e imágenes generadas por el grupo.
       </p>
 
-      <div className="grid" role="list" aria-label="Galería de especies">
+      <ul className="grid" aria-label="Galería de especies">
         {especies.map((e) => (
-          <article className="card" role="listitem" key={e.nombre}>
+          <li key={e.nombre}>
+            <button
+              className="card"
+              onClick={() => definirContexto(e.nombre, e.descripcion)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  definirContexto(e.nombre, e.descripcion);
+                }
+              }}
+            >
             <div className="media">
               {e.imgSrc ? (
-                <img src={e.imgSrc} alt={`Ilustración de ${e.nombre}`} loading="lazy" />
+                <img
+                  src={e.imgSrc}
+                  alt={`Ilustración de ${e.nombre}`}
+                  loading="lazy"
+                />
               ) : (
-                <div className="placeholder" aria-label={`Espacio para la imagen de ${e.nombre}`}>
+                <div
+                  className="placeholder"
+                  aria-label={`Espacio para la imagen de ${e.nombre}`}
+                >
                   <span>Espacio para la foto</span>
                 </div>
               )}
@@ -98,9 +143,10 @@ export default function DinosauriosGallery() {
               <h3>{e.nombre}</h3>
               <p>{e.descripcion}</p>
             </div>
-          </article>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
