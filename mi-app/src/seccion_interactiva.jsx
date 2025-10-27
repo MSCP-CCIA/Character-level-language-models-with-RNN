@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function SeccionInteractiva() {
   const [items, setItems] = useState([]);
@@ -8,6 +9,42 @@ export default function SeccionInteractiva() {
   // Si usas variable de entorno en .env: VITE_API_BASE=http://localhost:8000
   const API_BASE = (import.meta.env.VITE_API_BASE || "").replace(/\/+$/, "");
 
+  // === Nueva función para definir el contexto en el backend ===
+  const definirContexto = async (nombre, descripcion) => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8001/definir_contexto",
+        { nombre, descripcion },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: false,
+          timeout: 10000,
+        }
+      );
+
+      alert(response.data.mensaje);
+    } catch (error) {
+      console.error("❌ Error:", error);
+
+      if (error.response) {
+        alert(
+          `Error del servidor (${error.response.status}): ${
+            error.response.data?.mensaje || "Desconocido"
+          }`
+        );
+      } else if (error.request) {
+        alert(
+          "⚠️ El servidor no respondió (posible CORS o endpoint inactivo)."
+        );
+      } else {
+        alert("Error al preparar la solicitud.");
+      }
+    }
+  };
+
+  // === Función para generar dinosaurio ===
   async function generarDino() {
     setLoading(true);
     setStatus("");
@@ -28,11 +65,16 @@ export default function SeccionInteractiva() {
   return (
     <section style={styles.section}>
       <div style={styles.header}>
-        <h2 style={styles.title}>Sección Interactiva — Generador de Dinosaurios</h2>
+        <h2 style={styles.title}>
+          Sección Interactiva — Generador de Dinosaurios
+        </h2>
         <button
           onClick={generarDino}
           disabled={loading}
-          style={{ ...styles.button, ...(loading ? styles.buttonDisabled : {}) }}
+          style={{
+            ...styles.button,
+            ...(loading ? styles.buttonDisabled : {}),
+          }}
         >
           {loading ? "Generando..." : "Nuevo Dinosaurio"}
         </button>
@@ -50,22 +92,30 @@ export default function SeccionInteractiva() {
       <div style={styles.grid}>
         {items.map((dino, i) => (
           <article key={i} style={styles.card}>
-            <div style={styles.media}>
-              {dino.image_b64 ? (
-                <img
-                  src={dino.image_b64}
-                  alt={`Ilustración de ${dino.name}`}
-                  style={styles.img}
-                  loading="lazy"
-                />
-              ) : (
-                <div style={styles.placeholder}>Espacio para la imagen</div>
-              )}
-            </div>
-            <div style={styles.body}>
-              <h3 style={styles.cardTitle}>{dino.name}</h3>
-              <p style={styles.desc}>{dino.description}</p>
-            </div>
+            <button
+              style={styles.cardButton}
+              onClick={() => definirContexto(dino.name, dino.description)}
+              title="Haz clic para definir este dinosaurio como contexto"
+            >
+              <div style={styles.media}>
+                {dino.image_b64 ? (
+                  <img
+                    src={dino.image_b64}
+                    alt={`Ilustración de ${dino.name}`}
+                    style={styles.img}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div style={styles.placeholder}>
+                    Espacio para la imagen
+                  </div>
+                )}
+              </div>
+              <div style={styles.body}>
+                <h3 style={styles.cardTitle}>{dino.name}</h3>
+                <p style={styles.desc}>{dino.description}</p>
+              </div>
+            </button>
           </article>
         ))}
       </div>
@@ -127,6 +177,14 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     transition: "all .2s ease",
+  },
+  cardButton: {
+    all: "unset",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
   },
   media: {
     width: "100%",

@@ -19,7 +19,6 @@ app.add_middleware(
 contexto_global = {
     "nombre": None,
     "descripcion": None,
-    "conversation": [],
     "configurado": False
 }
 
@@ -64,7 +63,7 @@ modelo = ChatGoogleGenerativeAI(
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("system",
-     "You are {dino_nombre}. Your personality, knowledge, and memories are strictly limited to the following description: '{dino_descripcion}'. The actual conversation with the user is: '{conversation}'. Respond to the user by acting like this dinosaur, based solely on that information. Do not fabricate facts or knowledge outside of that description. Be direct and stay in character at all times."),
+     "You are {dino_nombre}. Your personality, knowledge, and memories are strictly limited to the following description: '{dino_descripcion}'. Respond to the user by acting like this dinosaur, based solely on that information. Do not fabricate facts or knowledge outside of that description. Be direct and stay in character at all times."),
     ("user", "{mensaje_usuario}")
 ])
 
@@ -88,7 +87,6 @@ async def definir_contexto(contexto: DinosaurioContexto):
     """
     contexto_global["nombre"] = contexto.nombre
     contexto_global["descripcion"] = contexto.descripcion
-    contexto_global["conversation"] = []
     contexto_global["configurado"] = True
     return ConfirmacionContexto(mensaje=f"Contexto actualizado a {contexto.nombre}")
 
@@ -123,7 +121,6 @@ async def conversar(mensaje: MensajeUsuario):
         async for chunk in cadena.astream({
             "dino_nombre": contexto_global["nombre"],
             "dino_descripcion": contexto_global["descripcion"],
-            "conversation": "\n".join(contexto_global["conversation"]),
             "mensaje_usuario": mensaje.mensaje
         }):
             if hasattr(chunk, 'content'):

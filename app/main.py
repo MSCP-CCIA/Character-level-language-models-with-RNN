@@ -17,7 +17,7 @@ NGROK_TEXT_URL = os.getenv(
 )
 IMG_URL = os.getenv(
     "IMG_API_URL",
-    "https://01975b2936c4.ngrok-free.app/generate-image/"
+    "https://c5a76c95644b.ngrok-free.app/generate-image/"
 )
 
 REQUEST_TIMEOUT = float(os.getenv("REQUEST_TIMEOUT", "120"))
