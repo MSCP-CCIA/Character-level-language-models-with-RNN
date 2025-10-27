@@ -1,32 +1,25 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Chat con Dinosaurios", version="1.0.0")
 
-@app.options("/{rest_of_path:path}")
-async def options_handler(rest_of_path: str):
-    """
-    Respuesta genérica para cualquier petición OPTIONS (preflight CORS).
-    Esto evita el error 405 Method Not Allowed y asegura que los navegadores
-    puedan realizar peticiones POST sin bloqueo.
-    """
-    return JSONResponse(
-        content={"message": "ok"},
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
-        },
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 contexto_global = {
     "nombre": None,
     "descripcion": None,
+    "conversation": [],
     "configurado": False
 }
 
@@ -71,7 +64,7 @@ modelo = ChatGoogleGenerativeAI(
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("system",
-     "You are {dino_nombre}. Your personality, knowledge, and memories are strictly limited to the following description: '{dino_descripcion}'. Respond to the user by acting like this dinosaur, based solely on that information. Do not fabricate facts or knowledge outside of that description. Be direct and stay in character at all times."),
+     "You are {dino_nombre}. Your personality, knowledge, and memories are strictly limited to the following description: '{dino_descripcion}'. The actual conversation with the user is: '{conversation}'. Respond to the user by acting like this dinosaur, based solely on that information. Do not fabricate facts or knowledge outside of that description. Be direct and stay in character at all times."),
     ("user", "{mensaje_usuario}")
 ])
 
@@ -95,6 +88,7 @@ async def definir_contexto(contexto: DinosaurioContexto):
     """
     contexto_global["nombre"] = contexto.nombre
     contexto_global["descripcion"] = contexto.descripcion
+    contexto_global["conversation"] = []
     contexto_global["configurado"] = True
     return ConfirmacionContexto(mensaje=f"Contexto actualizado a {contexto.nombre}")
 
@@ -129,6 +123,7 @@ async def conversar(mensaje: MensajeUsuario):
         async for chunk in cadena.astream({
             "dino_nombre": contexto_global["nombre"],
             "dino_descripcion": contexto_global["descripcion"],
+            "conversation": "\n".join(contexto_global["conversation"]),
             "mensaje_usuario": mensaje.mensaje
         }):
             if hasattr(chunk, 'content'):
@@ -169,4 +164,4 @@ if __name__ == "__main__":
         print(f"Iniciando servidor FastAPI en http://127.0.0.1:8000")
         print("Estado inicial: Sin dinosaurio configurado")
         print("Usa POST /definir_contexto para configurar un dinosaurio antes de conversar")
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+        uvicorn.run(app, host="0.0.0.0", port=8001)

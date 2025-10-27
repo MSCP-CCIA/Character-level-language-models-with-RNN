@@ -1,4 +1,6 @@
 import "./seccion_ejemplos.css";
+import axios from "axios";
+
 import img1 from "./assets/1.jpg";
 import img2 from "./assets/2.jpg";
 import img3 from "./assets/3.jpg";
@@ -74,31 +76,35 @@ export default function DinosauriosGallery() {
     },
   ];
 
-  // Función para definir el contexto en el backend
   const definirContexto = async (nombre, descripcion) => {
     try {
-      const response = await fetch(
-        "https://propertied-carolann-nonprivileged.ngrok-free.dev/definir_contexto",
+      const response = await axios.post(
+        "http://127.0.0.1:8001/definir_contexto",
+        { nombre, descripcion },
         {
-          method: "POST",
-          mode: "cors", 
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
           },
-          body: JSON.stringify({ nombre, descripcion }),
+          withCredentials: false, // 👈 necesario si tu backend usa allow_origins=["*"]
+          timeout: 10000, // opcional, evita bloqueos largos si ngrok se duerme
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Error al definir el contexto del dinosaurio");
-      }
-
-      const data = await response.json();
-      alert(data.mensaje);
+      alert(response.data.mensaje);
     } catch (error) {
-      console.error("Error:", error);
-      alert("No se pudo configurar el dinosaurio");
+      console.error("❌ Error:", error);
+
+      if (error.response) {
+        alert(
+          `Error del servidor (${error.response.status}): ${
+            error.response.data?.mensaje || "Desconocido"
+          }`
+        );
+      } else if (error.request) {
+        alert("⚠️ El servidor no respondió (posible bloqueo por CORS o ngrok caído).");
+      } else {
+        alert("Error al preparar la solicitud.");
+      }
     }
   };
 
@@ -116,33 +122,33 @@ export default function DinosauriosGallery() {
               className="card"
               onClick={() => definirContexto(e.nombre, e.descripcion)}
               onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
+                if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
                   definirContexto(e.nombre, e.descripcion);
                 }
               }}
             >
-            <div className="media">
-              {e.imgSrc ? (
-                <img
-                  src={e.imgSrc}
-                  alt={`Ilustración de ${e.nombre}`}
-                  loading="lazy"
-                />
-              ) : (
-                <div
-                  className="placeholder"
-                  aria-label={`Espacio para la imagen de ${e.nombre}`}
-                >
-                  <span>Espacio para la foto</span>
-                </div>
-              )}
-            </div>
+              <div className="media">
+                {e.imgSrc ? (
+                  <img
+                    src={e.imgSrc}
+                    alt={`Ilustración de ${e.nombre}`}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div
+                    className="placeholder"
+                    aria-label={`Espacio para la imagen de ${e.nombre}`}
+                  >
+                    <span>Espacio para la foto</span>
+                  </div>
+                )}
+              </div>
 
-            <div className="body">
-              <h3>{e.nombre}</h3>
-              <p>{e.descripcion}</p>
-            </div>
+              <div className="body">
+                <h3>{e.nombre}</h3>
+                <p>{e.descripcion}</p>
+              </div>
             </button>
           </li>
         ))}
