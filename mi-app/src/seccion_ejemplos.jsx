@@ -1,5 +1,7 @@
+import { useState } from "react";
 import "./seccion_ejemplos.css";
 import axios from "axios";
+import DinoChat from "./DinoChat";
 
 import img1 from "./assets/1.jpg";
 import img2 from "./assets/2.jpg";
@@ -12,7 +14,167 @@ import img8 from "./assets/8.jpg";
 import img9 from "./assets/9.jpg";
 import img10 from "./assets/10.jpg";
 
+function ChatFloatingPanel({ dino, onClose, backendUrl }) {
+  if (!dino) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        right: "1.5rem",
+        bottom: "1.5rem",
+        width: "340px",
+        maxWidth: "90vw",
+
+        backgroundColor: "#0f1217",
+        border: "1px solid #1c2433",
+        borderRadius: "1rem",
+        boxShadow:
+          "0 30px 80px rgba(0,0,0,0.8), 0 0 40px rgba(76,222,128,0.15)",
+
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        fontFamily:
+          'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, "Helvetica Neue"',
+      }}
+    >
+      {/* HEADER del panel flotante */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          padding: "0.75rem 1rem",
+          background:
+            "linear-gradient(to right, rgba(16,23,34,1) 0%, rgba(24,46,34,0.6) 100%)",
+          borderBottom: "1px solid #1c2433",
+        }}
+      >
+        {/* mini preview del dino */}
+        <div
+          style={{
+            width: "48px",
+            height: "48px",
+            borderRadius: "0.5rem",
+            backgroundColor: "#0e1420",
+            border: "1px solid #1c2433",
+            overflow: "hidden",
+            flexShrink: 0,
+          }}
+        >
+          {dino.img ? (
+            <img
+              src={dino.img}
+              alt={dino.name}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "grid",
+                placeItems: "center",
+                color: "#9aa6ba",
+                fontSize: "0.6rem",
+                padding: "0.25rem",
+                textAlign: "center",
+              }}
+            >
+              sin imagen
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            lineHeight: 1.3,
+            color: "#e7ebf1",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              color: "#e7ebf1",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+            title={dino.name}
+          >
+            {dino.name}
+          </div>
+          <div
+            style={{
+              fontSize: "0.7rem",
+              color: "#4ade80",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+            title="Dinosaurio disponible para chat"
+          >
+            Disponible para chat
+          </div>
+        </div>
+
+        {/* Botón cerrar */}
+        <button
+          onClick={onClose}
+          style={{
+            all: "unset",
+            cursor: "pointer",
+            color: "#9aa6ba",
+            fontSize: "0.8rem",
+            lineHeight: 1,
+            padding: "0.4rem 0.5rem",
+            borderRadius: "0.4rem",
+            border: "1px solid #1c2433",
+            backgroundColor: "rgba(15,18,23,0.6)",
+          }}
+          title="Cerrar chat"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* El cuerpo del chat */}
+      <div
+        style={{
+          padding: "0.75rem 1rem 1rem",
+          backgroundColor: "#0f1217",
+        }}
+      >
+        <DinoChat
+          name={dino.name}
+          description={dino.description}
+          backendUrl={backendUrl}
+        />
+      </div>
+    </div>
+  );
+}
+
+
 export default function DinosauriosGallery() {
+  const [selected, setSelected] = useState(null);
+
+    const [showChat, setShowChat] = useState(false);
+
+  const CHAT_BACKEND = "http://127.0.0.1:8001";
+
+
   const especies = [
     {
       nombre: "Pacospylus",
@@ -76,43 +238,20 @@ export default function DinosauriosGallery() {
     },
   ];
 
-  const definirContexto = async (nombre, descripcion) => {
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8001/definir_contexto",
-        { nombre, descripcion },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: false, // 👈 necesario si tu backend usa allow_origins=["*"]
-          timeout: 10000, // opcional, evita bloqueos largos si ngrok se duerme
-        }
-      );
-
-      alert(response.data.mensaje);
-    } catch (error) {
-      console.error("❌ Error:", error);
-
-      if (error.response) {
-        alert(
-          `Error del servidor (${error.response.status}): ${
-            error.response.data?.mensaje || "Desconocido"
-          }`
-        );
-      } else if (error.request) {
-        alert("⚠️ El servidor no respondió (posible bloqueo por CORS o ngrok caído).");
-      } else {
-        alert("Error al preparar la solicitud.");
-      }
-    }
-  };
+    function handleSelect(d) {
+    setSelected({
+      name: d.nombre,
+      description: d.descripcion,
+      img: d.imgSrc,
+    });
+    setShowChat(true);
+  }
 
   return (
     <section aria-labelledby="galeria-dinos" className="galeria-dinos">
       <h2 id="galeria-dinos">DinoNames Generados</h2>
       <p>
-        A continuación se presentan los nombres, descripciones e imágenes generadas por el grupo.
+        A continuación se presentan los nombres, descripciones e imágenes generadas por el grupo, Selecciona un dinosaurio para hablar con él. Abajo verás el chat.
       </p>
 
       <ul className="grid" aria-label="Galería de especies">
@@ -120,11 +259,11 @@ export default function DinosauriosGallery() {
           <li key={e.nombre}>
             <button
               className="card"
-              onClick={() => definirContexto(e.nombre, e.descripcion)}
+              onClick={() => handleSelect(e)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  definirContexto(e.nombre, e.descripcion);
+                  handleSelect(e);
                 }
               }}
             >
@@ -153,6 +292,16 @@ export default function DinosauriosGallery() {
           </li>
         ))}
       </ul>
+    
+      {/* Panel flotante del chat */}
+      {showChat && selected && (
+        <ChatFloatingPanel
+          dino={selected}
+          backendUrl={CHAT_BACKEND}
+          onClose={() => setShowChat(false)}
+        />
+      )}
+     
     </section>
   );
 }

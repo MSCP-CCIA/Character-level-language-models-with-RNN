@@ -1,13 +1,17 @@
 import { useState } from "react";
 import axios from "axios";
+import DinoChat from "./DinoChat";
 
 export default function SeccionInteractiva() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
+  const [selected, setSelected] = useState(null);
 
   // Si usas variable de entorno en .env: VITE_API_BASE=http://localhost:8000
   const API_BASE = (import.meta.env.VITE_API_BASE || "").replace(/\/+$/, "");
+
+  const CHAT_BACKEND = "http://127.0.0.1:8001";
 
   // === Nueva función para definir el contexto en el backend ===
   const definirContexto = async (nombre, descripcion) => {
@@ -53,7 +57,13 @@ export default function SeccionInteractiva() {
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json(); // { name, description, image_b64 }
       setItems((prev) => [data, ...prev]);
-      setStatus("¡Nuevo dinosaurio generado con éxito!");
+      setSelected({
+        name: data.name,
+        description: data.description,
+        img: data.image_b64,
+      });
+
+      setStatus(`¡Dinosaurio generado! - ${data.name}`);
     } catch (err) {
       console.error(err);
       setStatus(`Error: ${err.message}`);
@@ -66,7 +76,7 @@ export default function SeccionInteractiva() {
     <section style={styles.section}>
       <div style={styles.header}>
         <h2 style={styles.title}>
-          Sección Interactiva — Generador de Dinosaurios
+          Sección Interactiva — Generador de Dinosaurios + DinoChat
         </h2>
         <button
           onClick={generarDino}
@@ -89,39 +99,100 @@ export default function SeccionInteractiva() {
         {status}
       </p>
 
-      <div style={styles.grid}>
-        {items.map((dino, i) => (
-          <article key={i} style={styles.card}>
-            <button
-              style={styles.cardButton}
-              onClick={() => definirContexto(dino.name, dino.description)}
-              title="Haz clic para definir este dinosaurio como contexto"
-            >
-              <div style={styles.media}>
-                {dino.image_b64 ? (
-                  <img
-                    src={dino.image_b64}
-                    alt={`Ilustración de ${dino.name}`}
-                    style={styles.img}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div style={styles.placeholder}>
-                    Espacio para la imagen
+        <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "2rem",
+          alignItems: "flex-start",
+        }}
+      >
+        {/* IZQUIERDA: lista de dinosaurios generados */}
+        <div style={{ flex: "2 1 320px" }}>
+          <div style={styles.grid}>
+            {items.map((dino, i) => (
+              <article
+                key={i}
+                style={{
+                  ...styles.card,
+                  outline:
+                    selected && selected.name === dino.name
+                      ? "2px solid #4ade80"
+                      : "none",
+                }}
+              >
+                <button
+                  style={styles.cardButton}
+                  onClick={() =>
+                    setSelected({
+                      name: dino.name,
+                      description: dino.description,
+                      img: dino.image_b64,
+                    })
+                  }
+                  title="Haz clic para chatear con este dinosaurio"
+                >
+                  <div style={styles.media}>
+                    {dino.image_b64 ? (
+                      <img
+                        src={dino.image_b64}
+                        alt={dino.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                          borderRadius: "8px",
+                          border: "1px solid #1c2433",
+                          background: "#000",
+                        }}
+                      />
+                    ) : (
+                      <div style={styles.placeholder}>
+                        Espacio para la imagen
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div style={styles.body}>
-                <h3 style={styles.cardTitle}>{dino.name}</h3>
-                <p style={styles.desc}>{dino.description}</p>
-              </div>
-            </button>
-          </article>
-        ))}
+
+                  <div style={styles.body}>
+                    <h3 style={styles.cardTitle}>{dino.name}</h3>
+                    <p style={styles.desc}>{dino.description}</p>
+                  </div>
+                </button>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* DERECHA: chat con el dinosaurio seleccionado */}
+        <div style={{ flex: "1 1 320px" }}>
+          {selected ? (
+            <DinoChat
+              name={selected.name}
+              description={selected.description}
+              backendUrl={CHAT_BACKEND}
+            />
+          ) : (
+            <div
+              style={{
+                background: "#0f1217",
+                border: "1px solid #1c2433",
+                borderRadius: "1rem",
+                padding: "1rem",
+                color: "#9aa6ba",
+                fontSize: "0.9rem",
+                lineHeight: 1.5,
+              }}
+            >
+              Genera un dinosaurio o haz clic en uno existente para iniciar el
+              chat 🦖💬
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
 }
+
 
 // ======== ESTILOS ========
 const styles = {
