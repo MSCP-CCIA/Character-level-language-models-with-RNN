@@ -172,7 +172,7 @@ export default function DinosauriosGallery() {
 
     const [showChat, setShowChat] = useState(false);
 
-  const CHAT_BACKEND = "http://127.0.0.1:8001";
+  const CHAT_BACKEND = "http://34.201.213.246:8001";
 
 
   const especies = [

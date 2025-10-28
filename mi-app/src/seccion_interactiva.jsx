@@ -11,13 +11,13 @@ export default function SeccionInteractiva() {
   // Si usas variable de entorno en .env: VITE_API_BASE=http://localhost:8000
   const API_BASE = (import.meta.env.VITE_API_BASE || "").replace(/\/+$/, "");
 
-  const CHAT_BACKEND = "http://127.0.0.1:8001";
+  const CHAT_BACKEND = "http://34.201.213.246:8001";
 
   // === Nueva función para definir el contexto en el backend ===
   const definirContexto = async (nombre, descripcion) => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8001/definir_contexto",
+        "http://34.201.213.246:8001/definir_contexto",
         { nombre, descripcion },
         {
           headers: {
